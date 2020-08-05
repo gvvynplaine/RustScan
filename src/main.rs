@@ -8,7 +8,7 @@ use futures::executor::block_on;
 use rlimit::Resource;
 use rlimit::{getrlimit, setrlimit};
 use std::process::Command;
-use std::{net::IpAddr, time::Duration};
+use std::{net::IpAddr, time::Duration, fs::File, io::Read};
 use structopt::StructOpt;
 
 extern crate dirs;
@@ -73,6 +73,8 @@ fn main() {
     if !opts.quiet {
         print_opening();
     }
+
+    get_config_file();
 
     let ulimit: rlimit::rlim = adjust_ulimit_size(&opts);
     let batch_size: u32 = infer_batch_size(&opts, ulimit);
@@ -161,6 +163,11 @@ fn print_opening() {
     Faster nmap scanning with rust.";
     println!("{}\n", s.green());
 
+}
+
+fn get_config_file(){
+    // TODO quiet mode
+
     let config_path = match dirs::config_dir() {
         Some(mut path) => {
             path.push("rustscan");
@@ -170,12 +177,22 @@ fn print_opening() {
         None => panic!("Couldn't find config dir."),
     };
 
+
+    let mut file = File::open(config_path).unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents);
+
+        // XXX is there a way to read directly from a file into a struct/
+
+
+
     println!(
         "{} {:?}\n",
         "The config file is expected to be at".yellow(),
         config_path
     );
 }
+
 #[cfg(not(tarpaulin_include))]
 fn build_nmap_arguments<'a>(
     addr: &'a str,
