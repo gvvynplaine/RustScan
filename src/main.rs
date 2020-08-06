@@ -8,8 +8,9 @@ use futures::executor::block_on;
 use rlimit::Resource;
 use rlimit::{getrlimit, setrlimit};
 use std::process::Command;
-use std::{net::IpAddr, time::Duration, fs::File, io::Read};
+use std::{fs::File, io::Read, net::IpAddr, path::PathBuf, time::Duration};
 use structopt::StructOpt;
+use toml::Value;
 
 extern crate dirs;
 // Average value for Ubuntu
@@ -162,35 +163,40 @@ fn print_opening() {
     |_|  \\_\\__,_|___/\\__|_____/ \\___\\__,_|_| |_|
     Faster nmap scanning with rust.";
     println!("{}\n", s.green());
-
 }
 
-fn get_config_file(){
-    // TODO quiet mode
+fn get_config_file() {
+    let result_get_location = get_location_config();
+    let location = match result_get_location{
+        Ok(path) => {path},
+        Err(_) => {panic!("Your system does not have appdirs.")}
+    };
 
+    let loaded_config_file = load_and_parse_config_file(location);
+}
+
+fn get_location_config() -> Result<std::path::PathBuf, &'static str>{
     let config_path = match dirs::config_dir() {
         Some(mut path) => {
             path.push("rustscan");
             path.push("config.toml");
-            path
+            Ok(path)
         }
-        None => panic!("Couldn't find config dir."),
+        None => Err("Your system does not have APPDIRS"),
     };
+    config_path
+}
 
+fn load_and_parse_config_file(config_path: PathBuf) -> Value {
+    // Gets the file and returns the
+    // TODO quiet mode
 
     let mut file = File::open(config_path).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents);
 
-        // XXX is there a way to read directly from a file into a struct/
+    contents.parse::<Value>();
 
-
-
-    println!(
-        "{} {:?}\n",
-        "The config file is expected to be at".yellow(),
-        config_path
-    );
 }
 
 #[cfg(not(tarpaulin_include))]
