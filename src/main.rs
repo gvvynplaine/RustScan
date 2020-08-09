@@ -204,6 +204,18 @@ Faster Nmap scanning with Rust."#;
     // println!("{}", loaded_config_file);
 }
 
+fn get_config_file() {
+    let result_get_location = get_location_config();
+    let location = match result_get_location {
+        Ok(path) => path,
+        Err(_) => panic!("Your system does not have appdirs."),
+    };
+
+    detail!(format!("The config file is at {:?}", location));
+
+    load_and_parse_config_file(location);
+}
+
 fn get_location_config() -> Result<std::path::PathBuf, &'static str> {
     let config_path = match dirs::config_dir() {
         Some(mut path) => {
@@ -213,24 +225,11 @@ fn get_location_config() -> Result<std::path::PathBuf, &'static str> {
         }
         None => Err("Your system does not have APPDIRS"),
     };
-    detail!(format!(
-        "{} {:?}",
-        "The config file is expected to be at", config_path
-    ));
     config_path
-}
-fn get_config_file() {
-    let result_get_location = get_location_config();
-    let location = match result_get_location {
-        Ok(path) => path,
-        Err(_) => panic!("Your system does not have appdirs."),
-    };
-
-    let loaded_config_file = load_and_parse_config_file(location);
 }
 
 fn load_and_parse_config_file(config_path: PathBuf) {
-    // Gets the file and returns the
+    // Gets the file and returns the string of TOML
     // TODO quiet mode
 
     let mut file = File::open(config_path).unwrap();
@@ -246,8 +245,15 @@ fn load_and_parse_config_file(config_path: PathBuf) {
 
     contents.parse::<Value>().unwrap();
     println!("{}", contents);
+    panic!("ahhh");
 }
 
+fn download_place_config_file(config_path: PathBuf){
+    // Downloads config file
+    // Places into Appdirs
+
+    let body = ureq::get("http://url.com").call().into_string()?
+}
 #[cfg(not(tarpaulin_include))]
 fn build_nmap_arguments<'a>(
     addr: &'a str,
