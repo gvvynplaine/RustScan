@@ -29,7 +29,7 @@
 <hr>
 
 # 🤔 What is this?
-1. Find ports quickly using Rustscan (**8 seconds at its fastest**).
+1. Find ports quickly using Rustscan (**3 seconds at its fastest**).
 2. Automatically runs `nmap` on those ports.
 3. ???
 4. Profit!
@@ -52,7 +52,7 @@
   </tr>
 </table>
 
-<sub><b>Note</b> This is an older gif. RustScan's current top speed is 8 seconds for all 65k ports. This gif is 26 seconds.</sub><br>
+<sub><b>Note</b> This is an older gif. RustScan's current top speed is 3 seconds for all 65k ports. This gif is 26 seconds.</sub><br>
 
 RustScans **only** job is to reduce the friction between finding open ports and inputting them into nmap.
 
@@ -281,7 +281,7 @@ In this case, I would say it is safe to increase the open file limit. As most Li
 Although, if this breaks anything, please don't blame me. 
 
 **Windows Subsystem for Linux**
-Windows Subsystem for Linux does not support ulimt (see issue #39). 
+Windows Subsystem for Linux does not support ulimit (see issue #39). 
 
 The best way is to use it on a host computer, in Docker, or in a VM that isn't WSL. 
 
