@@ -37,6 +37,10 @@ struct Opts {
     #[structopt(short, long)]
     quiet: bool,
 
+    ///Config file usage
+    #[structopt(short, long)]
+    config: bool,
+
     /// The batch size for port scanning, it increases or slows the speed of
     /// scanning. Depends on the open file limit of your OS.  If you do 65535
     /// it will do every port at the same time. Although, your OS may not
@@ -75,7 +79,9 @@ fn main() {
         print_opening();
     }
 
-    get_config_file();
+    if opts.config{
+        get_config_file();
+    }
 
     let ulimit: rlimit::rlim = adjust_ulimit_size(&opts);
     let batch_size: u32 = infer_batch_size(&opts, ulimit);
@@ -173,6 +179,8 @@ fn get_config_file() {
     };
 
     let loaded_config_file = load_and_parse_config_file(location);
+    panic!("test");
+    // println!("{}", loaded_config_file);
 }
 
 fn get_location_config() -> Result<std::path::PathBuf, &'static str>{
@@ -187,15 +195,23 @@ fn get_location_config() -> Result<std::path::PathBuf, &'static str>{
     config_path
 }
 
-fn load_and_parse_config_file(config_path: PathBuf) -> Value {
+fn load_and_parse_config_file(config_path: PathBuf) {
     // Gets the file and returns the
     // TODO quiet mode
 
     let mut file = File::open(config_path).unwrap();
+    // TODO Download config file here
+    /*let mut file = match res {
+        Ok(_) => {}
+        Err(_) => {
+            Err("")
+        }
+    }*/
     let mut contents = String::new();
-    file.read_to_string(&mut contents);
+    file.read_to_string(&mut contents).unwrap();
 
-    contents.parse::<Value>();
+    contents.parse::<Value>().unwrap();
+    println!("{}", contents);
 
 }
 
@@ -377,6 +393,7 @@ mod tests {
             timeout: 1000,
             ulimit: Some(2000),
             command: Vec::new(),
+            config: false,
         };
         let batch_size = infer_batch_size(&opts, 120);
 
@@ -392,6 +409,7 @@ mod tests {
             timeout: 1000,
             ulimit: Some(2000),
             command: Vec::new(),
+            config: false,
         };
         let batch_size = infer_batch_size(&opts, 9000);
 
@@ -408,6 +426,7 @@ mod tests {
             timeout: 1000,
             ulimit: Some(2000),
             command: Vec::new(),
+            config: false,
         };
         let batch_size = infer_batch_size(&opts, 5000);
 
@@ -423,6 +442,7 @@ mod tests {
             timeout: 1000,
             ulimit: Some(2000),
             command: Vec::new(),
+            config: false,
         };
         let batch_size = adjust_ulimit_size(&opts);
 
@@ -443,6 +463,7 @@ mod tests {
             timeout: 1000,
             ulimit: None,
             command: Vec::new(),
+            config: false,
         };
 
         infer_batch_size(&opts, 1000000);
